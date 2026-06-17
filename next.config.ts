@@ -1,7 +1,22 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "placehold.com",
+      },
+      {
+        protocol: "http",
+        hostname: "placehold.co",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
