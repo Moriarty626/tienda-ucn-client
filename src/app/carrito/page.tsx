@@ -10,6 +10,7 @@ import { cartItemsAtom, cartTotalAtom } from "@/store/cart";
 import { Button } from "@/components/ui/button";
 import { axiosClient } from "@/clients";
 import { API_ROUTES } from "@/clients/apiRoutes";
+import { formatPrice } from "@/lib/utils";
 
 export default function CarritoPage() {
   const [items, setItems] = useAtom(cartItemsAtom);
@@ -101,8 +102,8 @@ export default function CarritoPage() {
                   <Plus size={14} />
                 </button>
               </div>
-              <p className="font-bold text-slate-900 w-24 text-right">
-                ${(item.precio * item.cantidad).toLocaleString("es-CL")}
+              <p className="font-bold text-slate-900 min-w-24 text-right">
+                {formatPrice(item.precio * item.cantidad)}
               </p>
               <button
                 onClick={() => removeItem(item.id)}
@@ -125,15 +126,13 @@ export default function CarritoPage() {
                 <span className="truncate flex-1 mr-2">
                   {item.nombre} x{item.cantidad}
                 </span>
-                <span>
-                  ${(item.precio * item.cantidad).toLocaleString("es-CL")}
-                </span>
+                <span>{formatPrice(item.precio * item.cantidad)}</span>
               </div>
             ))}
           </div>
           <div className="border-t border-slate-300 pt-4 flex justify-between font-bold text-lg text-slate-900 mb-6">
             <span>Total</span>
-            <span>${total.toLocaleString("es-CL")}</span>
+            <span>{formatPrice(total)}</span>
           </div>
           <Button
             className="w-full bg-blue-600 hover:bg-blue-700"

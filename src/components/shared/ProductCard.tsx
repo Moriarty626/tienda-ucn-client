@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useSetAtom } from "jotai";
 import { toast } from "sonner";
 import { Producto } from "@/domain/Producto";
@@ -21,6 +22,7 @@ interface ProductCardProps {
 
 export function ProductCard({ producto }: ProductCardProps) {
   const setCart = useSetAtom(cartItemsAtom);
+  const router = useRouter();
 
   const addToCart = () => {
     setCart((prev) => {
@@ -40,7 +42,13 @@ export function ProductCard({ producto }: ProductCardProps) {
       };
       return [...prev, item];
     });
-    toast.success(`${producto.nombre} agregado al carrito`);
+    toast.success(`${producto.nombre} agregado al carrito`, {
+      duration: 1200,
+      action: {
+        label: "Ver carrito",
+        onClick: () => router.push("/carrito"),
+      },
+    });
   };
 
   return (

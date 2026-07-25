@@ -33,7 +33,12 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
           </QueryProvider>
-          <Toaster richColors position="top-right" />
+          <Toaster
+            richColors
+            position="top-right"
+            duration={1500}
+            closeButton
+          />
         </SessionProvider>
       </body>
     </html>

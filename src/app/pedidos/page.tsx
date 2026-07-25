@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { FileDown, Package } from "lucide-react";
 import { orderService, Order } from "@/services/orderService";
 import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/lib/utils";
 
 function downloadPdf(order: Order) {
   import("jspdf").then(({ default: jsPDF }) => {
@@ -134,17 +135,14 @@ export default function PedidosPage() {
                     {item.nombre} x{item.cantidad}
                   </span>
                   <span>
-                    $
-                    {(item.cantidad * item.precioUnitario).toLocaleString(
-                      "es-CL"
-                    )}
+                    {formatPrice(item.cantidad * item.precioUnitario)}
                   </span>
                 </div>
               ))}
             </div>
             <div className="border-t border-slate-200 mt-3 pt-3 flex justify-between font-bold text-slate-900">
               <span>Total</span>
-              <span>${order.total.toLocaleString("es-CL")}</span>
+              <span>{formatPrice(order.total)}</span>
             </div>
           </div>
         ))}

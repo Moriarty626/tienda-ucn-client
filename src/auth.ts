@@ -24,11 +24,51 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const token = res.data?.token;
           if (!token) return null;
 
+          let userName = parsed.data.email;
+          let userRole = "Customer";
+
+          try {
+            const payloadBase64 = token.split(".")[1];
+            if (payloadBase64) {
+              const base64 = payloadBase64
+                .replace(/-/g, "+")
+                .replace(/_/g, "/");
+              const jsonPayload = decodeURIComponent(
+                atob(base64)
+                  .split("")
+                  .map(
+                    (c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+                  )
+                  .join("")
+              );
+              const decoded = JSON.parse(jsonPayload);
+              const extractedName =
+                decoded.name ||
+                decoded.unique_name ||
+                decoded[
+                  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+                ];
+              if (extractedName) {
+                userName = extractedName;
+              }
+              const extractedRole =
+                decoded.role ||
+                decoded[
+                  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+                ];
+              if (extractedRole) {
+                userRole = extractedRole;
+              }
+            }
+          } catch {
+            // Fallback en caso de error de decodificación
+          }
+
           return {
             id: parsed.data.email,
-            name: parsed.data.email,
+            name: userName,
             email: parsed.data.email,
-            rol: "Customer",
+            rol: userRole,
             token,
           };
         } catch {

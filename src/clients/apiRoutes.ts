@@ -14,6 +14,6 @@ export const API_ROUTES = {
   },
   orders: {
     create: "/api/order",
-    myOrders: "/api/order",
+    myOrders: "/api/order/history",
   },
 } as const;
