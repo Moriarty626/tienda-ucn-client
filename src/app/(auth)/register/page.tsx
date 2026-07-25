@@ -21,17 +21,35 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      await authService.register({
-        nombre: data.nombre,
-        email: data.email,
-        password: data.password,
-      });
+      await authService.register(data);
       toast.success("Cuenta creada. Revisa tu email para verificarla.");
-      router.push("/login");
+      router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
     } catch (error: unknown) {
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      const responseData = (error as {
+        response?: {
+          data?: {
+            message?: string;
+            title?: string;
+            errors?: Record<string, string[]>;
+            detail?: string;
+          };
+        };
+      })?.response?.data;
+
+      const firstFieldError = responseData?.errors
+        ? Object.values(responseData.errors)[0]?.[0]
+        : undefined;
+
       const msg =
-        (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message ?? "Error al crear la cuenta.";
+        (status === 409
+          ? "Ya existe una cuenta con esos datos. Revisa tu email y completa la verificacion si ya te registraste antes."
+          : undefined) ||
+        responseData?.message ||
+        responseData?.title ||
+        responseData?.detail ||
+        firstFieldError ||
+        "Error al crear la cuenta.";
       toast.error(msg);
     }
   };
@@ -83,6 +101,98 @@ export default function RegisterPage() {
           />
           {errors.email && (
             <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="rut"
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
+            RUT
+          </label>
+          <input
+            id="rut"
+            type="text"
+            autoComplete="off"
+            placeholder="12345678-9"
+            {...register("rut")}
+            className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSubmitting}
+          />
+          {errors.rut && (
+            <p className="mt-1 text-xs text-red-600">{errors.rut.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="phoneNumber"
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
+            Telefono
+          </label>
+          <input
+            id="phoneNumber"
+            type="tel"
+            autoComplete="tel"
+            placeholder="+569 12345678"
+            {...register("phoneNumber")}
+            className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSubmitting}
+          />
+          {errors.phoneNumber && (
+            <p className="mt-1 text-xs text-red-600">
+              {errors.phoneNumber.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="birthDate"
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
+            Fecha de nacimiento
+          </label>
+          <input
+            id="birthDate"
+            type="date"
+            autoComplete="bday"
+            {...register("birthDate")}
+            className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSubmitting}
+          />
+          {errors.birthDate && (
+            <p className="mt-1 text-xs text-red-600">
+              {errors.birthDate.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="gender"
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
+            Genero
+          </label>
+          <select
+            id="gender"
+            {...register("gender")}
+            className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            disabled={isSubmitting}
+            defaultValue=""
+          >
+            <option value="" disabled>
+              Selecciona tu genero
+            </option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+          {errors.gender && (
+            <p className="mt-1 text-xs text-red-600">{errors.gender.message}</p>
           )}
         </div>
 
@@ -162,6 +272,16 @@ export default function RegisterPage() {
           className="text-blue-600 hover:underline font-medium"
         >
           Inicia sesion
+        </Link>
+      </p>
+
+      <p className="mt-2 text-sm text-slate-500 text-center">
+        Ya recibiste tu codigo?{" "}
+        <Link
+          href="/verify-email"
+          className="text-blue-600 hover:underline font-medium"
+        >
+          Verifica tu correo
         </Link>
       </p>
     </div>

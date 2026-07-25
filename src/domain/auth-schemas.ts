@@ -1,5 +1,50 @@
 import { z } from "zod";
 
+const normalizeRut = (rut: string) => rut.replace(/\./g, "").toUpperCase();
+
+const isValidRut = (rut: string) => {
+  const normalizedRut = normalizeRut(rut);
+
+  if (!/^\d{7,8}-[0-9K]$/.test(normalizedRut)) {
+    return false;
+  }
+
+  const [body, verifier] = normalizedRut.split("-");
+  const rutNumber = Number.parseInt(body, 10);
+
+  if (!Number.isFinite(rutNumber)) {
+    return false;
+  }
+
+  let multiplierIndex = 0;
+  let sum = 1;
+
+  for (let current = rutNumber; current !== 0; current = Math.floor(current / 10)) {
+    sum = (sum + (current % 10) * (9 - (multiplierIndex++ % 6))) % 11;
+  }
+
+  const expectedVerifier = String.fromCharCode(sum !== 0 ? sum + 47 : 75);
+  return expectedVerifier === verifier;
+};
+
+const isAdult = (birthDateString: string) => {
+  const birthDate = new Date(birthDateString);
+
+  if (Number.isNaN(birthDate.getTime())) {
+    return false;
+  }
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age >= 18;
+};
+
 // Esquema para Login
 export const LoginSchema = z.object({
   email: z
@@ -31,6 +76,22 @@ export const RegisterSchema = z
       .min(1, "Email es requerido")
       .email("Email invalido")
       .toLowerCase(),
+    rut: z
+      .string("RUT es requerido")
+      .min(1, "RUT es requerido")
+      .regex(/^\d{7,8}-[0-9kK]$/, "RUT debe tener formato XXXXXXXX-X")
+      .refine(isValidRut, "El RUT no es válido"),
+    phoneNumber: z
+      .string("Telefono es requerido")
+      .min(1, "Telefono es requerido")
+      .regex(/^\+569\s\d{8}$/, "Telefono debe tener formato +569 XXXXXXXX"),
+    birthDate: z
+      .string("Fecha de nacimiento es requerida")
+      .min(1, "Fecha de nacimiento es requerida")
+      .refine(isAdult, "Debes ser mayor de 18 años para registrarte"),
+    gender: z.enum(["Masculino", "Femenino", "Otro"], {
+      error: "Genero es requerido",
+    }),
     password: z
       .string("Contrasena es requerida")
       .min(1, "Contrasena es requerida")

@@ -23,16 +23,27 @@ axiosClient.interceptors.request.use(async (config) => {
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    const requestUrl = error.config?.url || "(sin url)";
+    const requestMethod = (error.config?.method || "GET").toUpperCase();
+
     if (error.response) {
-      console.error(
-        "Error en respuesta:",
-        error.response.status,
-        error.response.data
-      );
+      if (error.response.status >= 500) {
+        console.error(
+          `Error en respuesta ${requestMethod} ${requestUrl}:`,
+          error.response.status,
+          error.response.data
+        );
+      }
     } else if (error.request) {
-      console.error("Error en solicitud:", error.request);
+      console.error(
+        `Error de red en ${requestMethod} ${requestUrl}. Posible CORS, backend caido o timeout.`,
+        {
+          code: error.code,
+          message: error.message,
+        }
+      );
     } else {
-      console.error("Error:", error.message);
+      console.error(`Error al preparar ${requestMethod} ${requestUrl}:`, error.message);
     }
     return Promise.reject(error);
   }

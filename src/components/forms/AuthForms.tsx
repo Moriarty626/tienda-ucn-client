@@ -274,14 +274,17 @@ export function VerifyEmailForm({
   const [resendLoading, setResendLoading] = useState(false);
 
   const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<VerifyEmailFormData>({
-    resolver: zodResolver(VerifyEmailSchema),
-    defaultValues: { email },
-    mode: "onBlur",
-  });
+  control,
+  handleSubmit,
+  formState: { errors },
+} = useForm<VerifyEmailFormData>({
+  resolver: zodResolver(VerifyEmailSchema),
+  defaultValues: {
+    email: email ?? "",
+    code: "",
+  },
+  mode: "onBlur",
+});
 
   const onFormSubmit = async (data: VerifyEmailFormData) => {
     try {

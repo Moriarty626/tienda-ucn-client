@@ -3,16 +3,17 @@
 
 export const API_ROUTES = {
   auth: {
-    login: "/auth/login",
-    register: "/auth/register",
+    login: "/api/auth/login",
+    register: "/api/auth/register",
+    emailVerification: "/api/auth/email-verification",
   },
   products: {
-    list: "/products",
-    paginated: "/products/paginated",
-    byId: (id: number) => `/products/${id}`,
+    list: "/api/product",
+    paginated: "/api/product",
+    byId: (id: number) => `/api/product/${id}`,
   },
   orders: {
-    create: "/orders",
-    myOrders: "/orders/my",
+    create: "/api/order",
+    myOrders: "/api/order",
   },
 } as const;

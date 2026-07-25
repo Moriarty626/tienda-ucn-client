@@ -1,8 +1,12 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { LoginSchema } from "@/domain/auth-schemas";
-import { LoginResponseSchema } from "@/domain/User";
+import { API_ROUTES } from "@/clients/apiRoutes";
 import axios from "axios";
+
+interface BackendLoginResponse {
+  token: string;
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -12,19 +16,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!parsed.success) return null;
 
         try {
-          const res = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
+          const res = await axios.post<BackendLoginResponse>(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${API_ROUTES.auth.login}`,
             { email: parsed.data.email, password: parsed.data.password }
           );
-          const result = LoginResponseSchema.safeParse(res.data);
-          if (!result.success || !result.data.success) return null;
 
-          const { usuario, token } = result.data;
+          const token = res.data?.token;
+          if (!token) return null;
+
           return {
-            id: String(usuario.id),
-            name: usuario.nombre,
-            email: usuario.email,
-            rol: usuario.rol,
+            id: parsed.data.email,
+            name: parsed.data.email,
+            email: parsed.data.email,
+            rol: "Customer",
             token,
           };
         } catch {
