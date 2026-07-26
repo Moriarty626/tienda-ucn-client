@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Si es ruta admin y el usuario no es admin, redirigir a home
-    if (isAdmin && session.user?.rol !== "admin") {
+    if (isAdmin && session.user?.rol?.toLowerCase() !== "admin") {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
