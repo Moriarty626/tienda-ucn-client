@@ -64,11 +64,17 @@ const mapBackendProduct = (product: BackendProduct): Producto => {
   };
 };
 
-const toBackendParams = (params?: PaginationParams & FilterOptions) => ({
-  PageNumber: params?.page ?? 1,
-  PageSize: params?.limit ?? 12,
-  SearchTerm: params?.search?.trim() || undefined,
-});
+const toBackendParams = (params?: PaginationParams & FilterOptions) => {
+  const search = params?.search?.trim();
+  return {
+    PageNumber: params?.page ?? 1,
+    PageSize: params?.limit ?? 12,
+    SearchTerm: search && search.length >= 2 ? search : undefined,
+    CategoryName: params?.categoria || undefined,
+    PriceMin: params?.precioMin ?? undefined,
+    PriceMax: params?.precioMax ?? undefined,
+  };
+};
 
 const toPaginatedProducts = (
   payload: BackendPaginatedProducts

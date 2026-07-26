@@ -14,11 +14,14 @@ import { Producto } from "@/domain/Producto";
 import { Button } from "@/components/ui/button";
 
 const ProductSchema = z.object({
-  nombre: z.string().min(1, "Nombre es requerido"),
+  nombre: z.string().min(3, "Mínimo 3 caracteres").max(20, "Máximo 20 caracteres"),
+  descripcion: z.string().min(10, "Mínimo 10 caracteres").max(100, "Máximo 100 caracteres"),
   categoria: z.enum(["Electronica", "Ropa", "Hogar", "Juguetes", "Libros"], {
     message: "Categoria invalida",
   }),
-  precio: z.coerce.number().positive("El precio debe ser mayor a 0"),
+  marca: z.string().min(3, "Mínimo 3 caracteres").max(25, "Máximo 25 caracteres"),
+  precio: z.coerce.number().int().positive("El precio debe ser mayor a 0"),
+  stock: z.coerce.number().int().positive("El stock debe ser mayor a 0"),
 });
 
 type ProductFormData = z.infer<typeof ProductSchema>;
@@ -48,6 +51,7 @@ function ProductForm({
     resolver: zodResolver(ProductSchema) as never,
     defaultValues: {
       nombre: initial?.nombre ?? "",
+      descripcion: "",
       categoria:
         (initial?.categoria as
           | "Electronica"
@@ -55,7 +59,9 @@ function ProductForm({
           | "Hogar"
           | "Juguetes"
           | "Libros") ?? "Electronica",
+      marca: "",
       precio: initial?.precio ?? 0,
+      stock: 1,
     },
   });
 
@@ -86,23 +92,45 @@ function ProductForm({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Nombre
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
           <input
             {...register("nombre")}
             className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={isPending}
           />
-          {errors.nombre && (
-            <p className="mt-1 text-xs text-red-600">{errors.nombre.message}</p>
-          )}
+          {errors.nombre && <p className="mt-1 text-xs text-red-600">{errors.nombre.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Categoria
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Marca</label>
+          <select
+            {...register("marca")}
+            className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isPending}
+          >
+            <option value="">Seleccionar marca</option>
+            <option value="Apple">Apple</option>
+            <option value="Nike">Nike</option>
+            <option value="Samsung">Samsung</option>
+            <option value="Adidas">Adidas</option>
+            <option value="Sony">Sony</option>
+          </select>
+          {errors.marca && <p className="mt-1 text-xs text-red-600">{errors.marca.message}</p>}
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-slate-700 mb-1">Descripcion</label>
+          <textarea
+            {...register("descripcion")}
+            rows={3}
+            className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isPending}
+          />
+          {errors.descripcion && <p className="mt-1 text-xs text-red-600">{errors.descripcion.message}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Categoria</label>
           <select
             {...register("categoria")}
             className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -114,33 +142,35 @@ function ProductForm({
             <option value="Juguetes">Juguetes</option>
             <option value="Libros">Libros</option>
           </select>
-          {errors.categoria && (
-            <p className="mt-1 text-xs text-red-600">
-              {errors.categoria.message}
-            </p>
-          )}
+          {errors.categoria && <p className="mt-1 text-xs text-red-600">{errors.categoria.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Precio
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Precio</label>
           <input
             type="number"
             {...register("precio")}
             className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={isPending}
-            min="0"
+            min="1"
           />
-          {errors.precio && (
-            <p className="mt-1 text-xs text-red-600">{errors.precio.message}</p>
-          )}
+          {errors.precio && <p className="mt-1 text-xs text-red-600">{errors.precio.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Imagen
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Stock</label>
+          <input
+            type="number"
+            {...register("stock")}
+            className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isPending}
+            min="1"
+          />
+          {errors.stock && <p className="mt-1 text-xs text-red-600">{errors.stock.message}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Imagen</label>
           <input
             type="file"
             accept="image/*"
@@ -151,13 +181,7 @@ function ProductForm({
           />
           {preview && (
             <div className="mt-2 relative w-24 h-24 rounded-md overflow-hidden border border-slate-200">
-              <Image
-                src={preview}
-                alt="Vista previa"
-                fill
-                className="object-cover"
-                unoptimized
-              />
+              <Image src={preview} alt="Vista previa" fill className="object-cover" unoptimized />
             </div>
           )}
         </div>
@@ -218,10 +242,7 @@ export default function AdminPage() {
 
   const updateMutation = useMutation({
     mutationFn: (vars: { id: number; data: ProductFormData; imagen?: File }) =>
-      adminService.updateProducto(vars.id, {
-        ...vars.data,
-        imagen: vars.imagen,
-      }),
+      adminService.updateProducto(vars.id, { ...vars.data, imagen: vars.imagen }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["products"] });
       toast.success("Producto actualizado correctamente");

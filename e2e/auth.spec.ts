@@ -19,7 +19,7 @@ test.describe("Flujo de identidad", () => {
     );
     await page.fill(
       'input[type="password"]',
-      process.env.TEST_PASSWORD ?? "Admin123!"
+      process.env.TEST_PASSWORD ?? "Admin1234!"
     );
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL("/", { timeout: 8000 });

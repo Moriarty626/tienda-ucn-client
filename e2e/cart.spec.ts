@@ -1,38 +1,63 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Flujo de carrito", () => {
-  test("agregar producto al carrito actualiza el contador", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await page.waitForSelector(
-      '[data-testid="product-card"], .grid .rounded-lg',
-      { timeout: 8000 }
+test.describe("Flujo de carrito y checkout", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/login");
+    await page.fill(
+      'input[type="email"]',
+      process.env.TEST_EMAIL ?? "admin@tiendaucn.cl"
     );
-
-    const addBtn = page
-      .locator('button:has-text("Agregar al carrito")')
-      .first();
-    await addBtn.click();
-
-    const badge = page.locator("header").getByText(/^[1-9]/);
-    await expect(badge).toBeVisible({ timeout: 3000 });
+    await page.fill(
+      'input[type="password"]',
+      process.env.TEST_PASSWORD ?? "Admin1234!"
+    );
+    await page.click('button[type="submit"]');
+    await expect(page).toHaveURL("/", { timeout: 8000 });
   });
 
-  test("carrito muestra productos agregados y calcula total", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await page.waitForSelector('button:has-text("Agregar al carrito")', {
+  test("agregar producto al carrito muestra toast", async ({ page }) => {
+    await page.waitForSelector("button:has-text('Agregar al carrito')", {
       timeout: 8000,
     });
+    await page.locator("button:has-text('Agregar al carrito')").first().click();
+    await expect(page.locator("[data-sonner-toast]")).toBeVisible({
+      timeout: 5000,
+    });
+  });
 
-    await page.locator('button:has-text("Agregar al carrito")').first().click();
+  test("modificar cantidad en carrito actualiza el total", async ({ page }) => {
+    await page.waitForSelector("button:has-text('Agregar al carrito')", {
+      timeout: 8000,
+    });
+    await page.locator("button:has-text('Agregar al carrito')").first().click();
     await page.goto("/carrito");
 
-    await expect(page.locator("h1")).toContainText("Carrito");
-    await expect(
-      page.locator('button:has-text("Confirmar pedido")')
-    ).toBeVisible();
+    const totalBefore = await page
+      .locator("text=Total")
+      .locator("..")
+      .locator("span")
+      .last()
+      .textContent();
+
+    await page.locator("button").filter({ hasText: "+" }).first().click();
+
+    const totalAfter = await page
+      .locator("text=Total")
+      .locator("..")
+      .locator("span")
+      .last()
+      .textContent();
+
+    expect(totalBefore).not.toBe(totalAfter);
+  });
+
+  test("checkout exitoso redirige a pedidos", async ({ page }) => {
+    await page.waitForSelector("button:has-text('Agregar al carrito')", {
+      timeout: 8000,
+    });
+    await page.locator("button:has-text('Agregar al carrito')").first().click();
+    await page.goto("/carrito");
+    await page.click("button:has-text('Confirmar pedido')");
+    await expect(page).toHaveURL("/pedidos", { timeout: 10000 });
   });
 });

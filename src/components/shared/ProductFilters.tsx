@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { FilterOptions } from "@/domain/types";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface ProductFiltersProps {
   onFiltersChange: (filters: FilterOptions) => void;
@@ -20,16 +21,10 @@ export function ProductFilters({
     search: "",
   });
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debouncedSearch = useDebounce(filters.search ?? "", 400);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const search = e.target.value;
-    setFilters((prev) => ({ ...prev, search }));
-
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      onFiltersChange({ ...filters, search });
-    }, 400);
+    setFilters((prev) => ({ ...prev, search: e.target.value }));
   };
 
   const handleCategoryChange = (
@@ -64,10 +59,9 @@ export function ProductFilters({
   };
 
   useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, []);
+    onFiltersChange({ ...filters, search: debouncedSearch });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
 
   return (
     <div className="bg-slate-50 p-6 rounded-lg mb-6 border border-slate-200">

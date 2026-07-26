@@ -9,6 +9,10 @@ const axiosClient: AxiosInstance = axios.create({
   },
 });
 
+/**
+ * Interceptor de peticiones: agrega el token JWT de sesion a todas las peticiones
+ * El token se obtiene de la sesion de NextAuth
+ */
 axiosClient.interceptors.request.use(async (config) => {
   if (typeof window !== "undefined") {
     const { getSession } = await import("next-auth/react");
@@ -20,6 +24,12 @@ axiosClient.interceptors.request.use(async (config) => {
   return config;
 });
 
+/**
+ * Interceptor de respuestas: maneja errores globales
+ * - 500+: Errores del servidor
+ * - Errores de red: CORS, backend caido, timeout
+ * - 401: No autorizado (token expirado o invalido)
+ */
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -33,6 +43,16 @@ axiosClient.interceptors.response.use(
           error.response.status,
           error.response.data
         );
+      }
+
+      // Manejar errores 401: token expirado o invalido
+      if (error.response.status === 401) {
+        if (typeof window !== "undefined") {
+          // Podremos agregar logica de refresh token aqui en el futuro
+          console.warn(
+            `Token invalido o expirado en ${requestMethod} ${requestUrl}`
+          );
+        }
       }
     } else if (error.request) {
       console.error(
