@@ -66,11 +66,11 @@ export function useProductFiltersUrl() {
         params.set("categoria", newFilters.categoria);
       }
 
-      if (newFilters.precioMin !== undefined && newFilters.precioMin > 0) {
+      if (newFilters.precioMin !== undefined && !isNaN(newFilters.precioMin) && newFilters.precioMin >= 0) {
         params.set("precioMin", newFilters.precioMin.toString());
       }
 
-      if (newFilters.precioMax !== undefined && newFilters.precioMax > 0) {
+      if (newFilters.precioMax !== undefined && !isNaN(newFilters.precioMax) && newFilters.precioMax >= 0) {
         params.set("precioMax", newFilters.precioMax.toString());
       }
 

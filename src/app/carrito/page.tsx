@@ -40,8 +40,17 @@ export default function CarritoPage() {
       setItems([]);
       toast.success("Pedido realizado correctamente");
       router.push("/pedidos");
-    } catch {
-      toast.error("Error al procesar el pedido. Intenta de nuevo.");
+    } catch (err: any) {
+      if (err?.response?.status === 401) {
+        toast.error("Debes iniciar sesión para confirmar tu pedido.");
+        router.push("/login");
+      } else {
+        const message =
+          err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          "Error al procesar el pedido. Intenta de nuevo.";
+        toast.error(message);
+      }
     } finally {
       setIsCheckingOut(false);
     }

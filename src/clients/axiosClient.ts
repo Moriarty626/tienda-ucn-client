@@ -11,10 +11,14 @@ const axiosClient: AxiosInstance = axios.create({
 
 axiosClient.interceptors.request.use(async (config) => {
   if (typeof window !== "undefined") {
-    const { getSession } = await import("next-auth/react");
-    const session = await getSession();
-    if (session?.backendToken) {
-      config.headers.Authorization = `Bearer ${session.backendToken}`;
+    try {
+      const { getSession } = await import("next-auth/react");
+      const session = await getSession();
+      if (session?.backendToken) {
+        config.headers.Authorization = `Bearer ${session.backendToken}`;
+      }
+    } catch {
+      // Ignorar si falla la verificación de sesión
     }
   }
   return config;

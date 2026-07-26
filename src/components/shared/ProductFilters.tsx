@@ -6,30 +6,50 @@ import { FilterOptions } from "@/domain/types";
 
 interface ProductFiltersProps {
   onFiltersChange: (filters: FilterOptions) => void;
+  initialFilters?: FilterOptions;
   isLoading?: boolean;
 }
 
 export function ProductFilters({
   onFiltersChange,
+  initialFilters,
   isLoading,
 }: ProductFiltersProps) {
   const [filters, setFilters] = useState<FilterOptions>({
-    categoria: "",
-    precioMin: undefined,
-    precioMax: undefined,
-    search: "",
+    categoria: initialFilters?.categoria || "",
+    precioMin: initialFilters?.precioMin,
+    precioMax: initialFilters?.precioMax,
+    search: initialFilters?.search || "",
   });
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const search = e.target.value;
-    setFilters((prev) => ({ ...prev, search }));
+  useEffect(() => {
+    setFilters({
+      categoria: initialFilters?.categoria || "",
+      precioMin: initialFilters?.precioMin,
+      precioMax: initialFilters?.precioMax,
+      search: initialFilters?.search || "",
+    });
+  }, [
+    initialFilters?.categoria,
+    initialFilters?.precioMin,
+    initialFilters?.precioMax,
+    initialFilters?.search,
+  ]);
 
+  const triggerDebouncedChange = (newFilters: FilterOptions) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      onFiltersChange({ ...filters, search });
-    }, 400);
+      onFiltersChange(newFilters);
+    }, 450);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const search = e.target.value;
+    const next = { ...filters, search };
+    setFilters(next);
+    triggerDebouncedChange(next);
   };
 
   const handleCategoryChange = (
@@ -37,22 +57,35 @@ export function ProductFilters({
   ) => {
     const next = { ...filters, categoria };
     setFilters(next);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     onFiltersChange(next);
   };
 
   const handlePriceMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const precioMin = e.target.value ? parseFloat(e.target.value) : undefined;
-    setFilters((prev) => ({ ...prev, precioMin }));
+    const val = e.target.value;
+    const precioMin =
+      val !== "" && !isNaN(Number(val)) ? parseFloat(val) : undefined;
+    const next = { ...filters, precioMin };
+    setFilters(next);
+    triggerDebouncedChange(next);
   };
 
   const handlePriceMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const precioMax = e.target.value ? parseFloat(e.target.value) : undefined;
-    setFilters((prev) => ({ ...prev, precioMax }));
+    const val = e.target.value;
+    const precioMax =
+      val !== "" && !isNaN(Number(val)) ? parseFloat(val) : undefined;
+    const next = { ...filters, precioMax };
+    setFilters(next);
+    triggerDebouncedChange(next);
   };
 
-  const handleApplyFilters = () => onFiltersChange(filters);
+  const handleApplyFilters = () => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    onFiltersChange(filters);
+  };
 
   const handleResetFilters = () => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     const reset: FilterOptions = {
       categoria: "",
       precioMin: undefined,
@@ -107,11 +140,11 @@ export function ProductFilters({
             disabled={isLoading}
           >
             <option value="">Todas</option>
-            <option value="Electronica">Electronica</option>
-            <option value="Ropa">Ropa</option>
+            <option value="Electronica">Electrónica</option>
             <option value="Hogar">Hogar</option>
-            <option value="Juguetes">Juguetes</option>
             <option value="Libros">Libros</option>
+            <option value="Juguetes">Juguetes</option>
+            <option value="Ropa">Ropa</option>
           </select>
         </div>
         <div>

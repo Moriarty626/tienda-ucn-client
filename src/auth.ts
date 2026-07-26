@@ -5,6 +5,11 @@ import { LoginResponseSchema } from "@/domain/User";
 import axios from "axios";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret:
+    process.env.AUTH_SECRET ||
+    process.env.NEXTAUTH_SECRET ||
+    "dev-secret-tienda-ucn-local",
+  trustHost: true,
   providers: [
     Credentials({
       async authorize(credentials) {
