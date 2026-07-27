@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { useProductsPaginated } from "@/hooks";
 import { ProductGrid } from "@/components/shared/ProductGrid";
 import { ProductFilters } from "@/components/shared/ProductFilters";
 import { Pagination } from "@/components/shared/Pagination";
-import { FilterOptions, PaginationParams } from "@/domain/types";
+import { useProductFiltersUrl } from "@/hooks/useProductFiltersUrl";
 
 interface ProductsViewProps {
   title?: string;
@@ -16,12 +15,8 @@ export function ProductsView({
   title = "Todos los Productos",
   description = "Explora nuestro catalogo completo de suministros y quimicos.",
 }: ProductsViewProps) {
-  const [pagination, setPagination] = useState<PaginationParams>({
-    page: 1,
-    limit: 12,
-  });
-
-  const [filters, setFilters] = useState<FilterOptions>({});
+  const { filters, pagination, updateFilters, updatePagination } =
+    useProductFiltersUrl();
 
   const {
     data: paginatedData,
@@ -32,13 +27,8 @@ export function ProductsView({
     ...filters,
   });
 
-  const handleFiltersChange = (newFilters: FilterOptions) => {
-    setFilters(newFilters);
-    setPagination({ ...pagination, page: 1 });
-  };
-
   const handlePageChange = (page: number) => {
-    setPagination({ ...pagination, page });
+    updatePagination({ ...pagination, page });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -63,7 +53,7 @@ export function ProductsView({
       </div>
 
       <ProductFilters
-        onFiltersChange={handleFiltersChange}
+        onFiltersChange={updateFilters}
         isLoading={isLoading}
       />
 

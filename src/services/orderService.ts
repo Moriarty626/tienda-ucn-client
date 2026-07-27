@@ -1,5 +1,6 @@
 import { axiosClient } from "@/clients";
 import { API_ROUTES } from "@/clients/apiRoutes";
+import { BackendResponse } from "@/clients/types";
 
 export interface OrderItem {
   productoId: number;
@@ -41,10 +42,12 @@ interface BackendOrder {
 
 export const orderService = {
   getMyOrders: async (): Promise<Order[]> => {
-    const response = await axiosClient.get<BackendOrder[]>(
+    const response = await axiosClient.get<BackendResponse<BackendOrder[]>>(
       API_ROUTES.orders.myOrders
     );
-    const data = Array.isArray(response.data) ? response.data : [];
+    // Manejar tanto el caso de respuesta envuelta (nuevo) como directa (compatibilidad)
+    const rawData = response.data?.data ?? (response.data as any);
+    const data = Array.isArray(rawData) ? rawData : [];
 
     return data.map((o) => ({
       id: o.id,

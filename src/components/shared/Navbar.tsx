@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useAtomValue } from "jotai";
 import { ShoppingCart, User, LogOut } from "lucide-react";
+import { toast } from "sonner";
 import { useAuth } from "@/hooks";
 import { authService } from "@/services/authService";
 import { cartCountAtom } from "@/store/cart";
@@ -10,6 +12,20 @@ import { cartCountAtom } from "@/store/cart";
 export default function Navbar() {
   const { user, isAuthenticated, isAdmin, isLoading } = useAuth();
   const cartCount = useAtomValue(cartCountAtom);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await authService.logout();
+      toast.success("Sesion cerrada correctamente");
+    } catch (error) {
+      toast.error("Error al cerrar sesion");
+      console.error("Logout error:", error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
@@ -68,8 +84,9 @@ export default function Navbar() {
                 <span className="hidden sm:inline">{user?.name}</span>
               </Link>
               <button
-                onClick={() => authService.logout()}
-                className="flex items-center gap-1 text-sm text-slate-500 hover:text-red-600 transition-colors"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="flex items-center gap-1 text-sm text-slate-500 hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 aria-label="Cerrar sesion"
               >
                 <LogOut size={18} />

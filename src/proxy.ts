@@ -22,7 +22,7 @@ export default auth((req) => {
     );
   }
 
-  if (isAdmin && session?.user?.rol !== "admin") {
+  if (isAdmin && session?.user?.rol?.toLowerCase() !== "admin") {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
