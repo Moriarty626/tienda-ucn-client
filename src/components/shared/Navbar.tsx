@@ -41,20 +41,20 @@ export default function Navbar() {
           >
             Catalogo
           </Link>
-          {isAdmin && (
-            <Link
-              href="/admin"
-              className="text-sm font-medium text-slate-600 hover:text-slate-900"
-            >
-              Admin
-            </Link>
-          )}
           {isAuthenticated && (
             <Link
               href="/pedidos"
               className="text-sm font-medium text-slate-600 hover:text-slate-900"
             >
               Mis pedidos
+            </Link>
+          )}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="text-sm font-medium text-slate-600 hover:text-slate-900"
+            >
+              Panel de Administracion
             </Link>
           )}
         </nav>

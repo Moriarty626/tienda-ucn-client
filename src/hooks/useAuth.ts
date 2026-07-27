@@ -10,6 +10,6 @@ export function useAuth() {
     token: session?.backendToken ?? null,
     isAuthenticated: status === "authenticated",
     isLoading: status === "loading",
-    isAdmin: session?.user?.rol === "admin",
+    isAdmin: session?.user?.rol?.toLowerCase() === "admin",
   };
 }
