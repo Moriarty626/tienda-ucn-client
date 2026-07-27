@@ -26,7 +26,7 @@ function LoginForm() {
     const result = await authService.login(data.email, data.password);
 
     if (result?.error) {
-      toast.error("Credenciales invalidas. Verifica tu email y contrasena.");
+      toast.error("Credenciales invalidas. Revisa tu email o contrasena.");
       return;
     }
 
@@ -113,16 +113,6 @@ export default function LoginPage() {
           className="text-blue-600 hover:underline font-medium"
         >
           Registrate
-        </Link>
-      </p>
-
-      <p className="mt-2 text-sm text-slate-500 text-center">
-        Ya tienes un codigo de verificacion?{" "}
-        <Link
-          href="/verify-email"
-          className="text-blue-600 hover:underline font-medium"
-        >
-          Verifica tu correo
         </Link>
       </p>
     </div>

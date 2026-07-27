@@ -274,16 +274,6 @@ export default function RegisterPage() {
           Inicia sesion
         </Link>
       </p>
-
-      <p className="mt-2 text-sm text-slate-500 text-center">
-        Ya recibiste tu codigo?{" "}
-        <Link
-          href="/verify-email"
-          className="text-blue-600 hover:underline font-medium"
-        >
-          Verifica tu correo
-        </Link>
-      </p>
     </div>
   );
 }
