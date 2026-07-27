@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { FilterOptions } from "@/domain/types";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -58,7 +58,15 @@ export function ProductFilters({
     onFiltersChange(reset);
   };
 
+  // En el primer render no se notifica: haria un push con filtros vacios y
+  // borraria los que vengan en la URL al recargar la pagina.
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     onFiltersChange({ ...filters, search: debouncedSearch });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);

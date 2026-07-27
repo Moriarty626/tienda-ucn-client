@@ -68,20 +68,26 @@ const mapBackendProduct = (product: BackendProduct): Producto => {
   };
 };
 
-const toBackendParams = (params?: PaginationParams & FilterOptions) => ({
-  PageNumber: params?.page ?? 1,
-  PageSize: params?.limit ?? 12,
-  SearchTerm: params?.search?.trim() || undefined,
-  Category: params?.categoria?.trim() || undefined,
-  MinPrice:
-      params?.precioMin !== undefined && !isNaN(params.precioMin)
-          ? params.precioMin
-          : undefined,
-  MaxPrice:
-      params?.precioMax !== undefined && !isNaN(params.precioMax)
-          ? params.precioMax
-          : undefined,
-});
+// Los nombres deben coincidir exactamente con SearchParamsDTO del backend:
+// PageNumber, PageSize, SearchTerm, CategoryName, PriceMin, PriceMax.
+const toBackendParams = (params?: PaginationParams & FilterOptions) => {
+  const search = params?.search?.trim();
+  return {
+    PageNumber: params?.page ?? 1,
+    PageSize: params?.limit ?? 12,
+    // El backend valida MinLength(2), un solo caracter provoca un 400.
+    SearchTerm: search && search.length >= 2 ? search : undefined,
+    CategoryName: params?.categoria?.trim() || undefined,
+    PriceMin:
+        params?.precioMin !== undefined && !isNaN(params.precioMin)
+            ? params.precioMin
+            : undefined,
+    PriceMax:
+        params?.precioMax !== undefined && !isNaN(params.precioMax)
+            ? params.precioMax
+            : undefined,
+  };
+};
 
 const toPaginatedProducts = (
     payload: BackendPaginatedProducts
@@ -97,7 +103,10 @@ export const productService = {
   getProducts: async (): Promise<Producto[]> => {
     const response = await axiosClient.get<
         BackendResponse<BackendPaginatedProducts>
-    >(API_ROUTES.products.list);
+    >(API_ROUTES.products.list, {
+      // PageNumber y PageSize son obligatorios en el backend (Range(1, ...)).
+      params: toBackendParams({ page: 1, limit: 50 }),
+    });
     return (response.data?.data?.products || []).map(mapBackendProduct);
   },
 
