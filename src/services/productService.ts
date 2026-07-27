@@ -1,16 +1,12 @@
 import { axiosClient } from "@/clients";
 import { API_ROUTES } from "@/clients/apiRoutes";
 import { Producto } from "@/domain/Producto";
+import { BackendResponse } from "@/clients/types";
 import {
   PaginatedProducts,
   FilterOptions,
   PaginationParams,
 } from "@/domain/types";
-
-interface BackendResponse<T> {
-  message: string;
-  data: T;
-}
 
 interface BackendProduct {
   id: number;
@@ -52,14 +48,21 @@ const parsePrice = (rawPrice: string): number => {
 };
 
 const mapBackendProduct = (product: BackendProduct): Producto => {
-  const priceNum = parsePrice(product.price);
+  if (!product) {
+    return {
+      id: 0,
+      nombre: "Producto no encontrado",
+      categoria: "Hogar",
+      precio: 0,
+      precioFormateado: "$0",
+    };
+  }
+  const priceNum = parsePrice(product.price || "0");
   return {
-    id: product.id,
-    nombre: product.name,
-    categoria: mapCategory(product.categoryName),
+    id: product.id || 0,
+    nombre: product.name || "Sin nombre",
+    categoria: mapCategory(product.categoryName || ""),
     precio: priceNum,
-    // Si tienes formatPrice, descomenta la siguiente línea y borra la de abajo:
-    // precioFormateado: formatPrice(product.price),
     precioFormateado: `$${priceNum.toLocaleString("es-CL")}`,
     imagenUrl: product.mainImagesURL ?? product.mainImagesUrl,
   };
@@ -114,7 +117,7 @@ export const productService = {
     const response = await axiosClient.get<BackendResponse<BackendProduct>>(
         API_ROUTES.products.byId(id)
     );
-    return mapBackendProduct(response.data.data);
+    return mapBackendProduct(response.data?.data);
   },
 
   getProductsByCategory: async (category: string): Promise<Producto[]> => {
