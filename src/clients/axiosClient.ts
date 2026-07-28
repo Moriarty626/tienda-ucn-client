@@ -47,11 +47,17 @@ axiosClient.interceptors.response.use(
 
       // Manejar errores 401: token expirado o invalido
       if (error.response.status === 401) {
-        if (typeof window !== "undefined") {
-          // Podremos agregar logica de refresh token aqui en el futuro
+        if (
+          typeof window !== "undefined" &&
+          !window.location.pathname.startsWith("/login") &&
+          !window.location.pathname.startsWith("/register")
+        ) {
           console.warn(
-            `Token invalido o expirado en ${requestMethod} ${requestUrl}`
+            `Token invalido o expirado en ${requestMethod} ${requestUrl}. Redirigiendo a inicio de sesion.`
           );
+          import("next-auth/react").then(({ signOut }) => {
+            signOut({ callbackUrl: "/login" });
+          });
         }
       }
     } else if (error.request) {

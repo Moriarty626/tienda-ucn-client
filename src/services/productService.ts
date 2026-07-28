@@ -19,6 +19,7 @@ interface BackendProduct {
   description: string;
   price: string;
   stockIndicator: string;
+  stock?: number;
   mainImagesURL?: string;
   mainImagesUrl?: string;
   categoryName: string;
@@ -54,12 +55,21 @@ const parsePrice = (rawPrice: string): number => {
 
 const mapBackendProduct = (product: BackendProduct): Producto => {
   const priceNum = parsePrice(product.price);
+  const stockVal =
+    typeof product.stock === "number"
+      ? product.stock
+      : product.stockIndicator === "Sin stock"
+      ? 0
+      : 10;
   return {
     id: product.id,
     nombre: product.name,
+    descripcion: product.description ?? "",
+    marca: product.brandName ?? "",
     categoria: mapCategory(product.categoryName),
     precio: priceNum,
     precioFormateado: formatPrice(product.price),
+    stock: stockVal,
     imagenUrl: product.mainImagesURL ?? product.mainImagesUrl,
   };
 };

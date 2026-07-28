@@ -51,7 +51,7 @@ function ProductForm({
     resolver: zodResolver(ProductSchema) as never,
     defaultValues: {
       nombre: initial?.nombre ?? "",
-      descripcion: "",
+      descripcion: initial?.descripcion ?? "",
       categoria:
         (initial?.categoria as
           | "Electronica"
@@ -59,9 +59,9 @@ function ProductForm({
           | "Hogar"
           | "Juguetes"
           | "Libros") ?? "Electronica",
-      marca: "",
+      marca: initial?.marca ?? "",
       precio: initial?.precio ?? 0,
-      stock: 1,
+      stock: initial?.stock ?? 1,
     },
   });
 
@@ -237,7 +237,27 @@ export default function AdminPage() {
       toast.success("Producto creado correctamente");
       setEditing(undefined);
     },
-    onError: () => toast.error("Error al crear el producto"),
+    onError: (error: unknown) => {
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      const responseData = (error as {
+        response?: {
+          data?: {
+            detail?: string;
+            message?: string;
+            title?: string;
+          };
+        };
+      })?.response?.data;
+
+      const msg =
+        status === 401
+          ? "Tu sesion ha expirado o no tienes permisos. Inicia sesion nuevamente."
+          : responseData?.detail ||
+            responseData?.message ||
+            responseData?.title ||
+            "Error al crear el producto";
+      toast.error(msg);
+    },
   });
 
   const updateMutation = useMutation({
@@ -248,7 +268,27 @@ export default function AdminPage() {
       toast.success("Producto actualizado correctamente");
       setEditing(undefined);
     },
-    onError: () => toast.error("Error al actualizar el producto"),
+    onError: (error: unknown) => {
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      const responseData = (error as {
+        response?: {
+          data?: {
+            detail?: string;
+            message?: string;
+            title?: string;
+          };
+        };
+      })?.response?.data;
+
+      const msg =
+        status === 401
+          ? "Tu sesion ha expirado o no tienes permisos. Inicia sesion nuevamente."
+          : responseData?.detail ||
+            responseData?.message ||
+            responseData?.title ||
+            "Error al actualizar el producto";
+      toast.error(msg);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -313,6 +353,9 @@ export default function AdminPage() {
                   Precio
                 </th>
                 <th className="text-right px-4 py-3 font-semibold text-slate-700">
+                  Stock
+                </th>
+                <th className="text-right px-4 py-3 font-semibold text-slate-700">
                   Acciones
                 </th>
               </tr>
@@ -326,6 +369,13 @@ export default function AdminPage() {
                   <td className="px-4 py-3 text-slate-600">{p.categoria}</td>
                   <td className="px-4 py-3 text-right text-slate-900">
                     {p.precioFormateado}
+                  </td>
+                  <td className="px-4 py-3 text-right font-medium">
+                    {p.stock <= 0 ? (
+                      <span className="text-red-600 font-semibold">Sin stock</span>
+                    ) : (
+                      p.stock
+                    )}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">

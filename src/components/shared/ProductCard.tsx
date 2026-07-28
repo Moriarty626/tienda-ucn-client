@@ -24,10 +24,20 @@ export function ProductCard({ producto }: ProductCardProps) {
   const setCart = useSetAtom(cartItemsAtom);
   const router = useRouter();
 
+  const isOutOfStock = (producto.stock ?? 0) <= 0;
+
   const addToCart = () => {
+    if (isOutOfStock) {
+      toast.error("Producto sin stock");
+      return;
+    }
     setCart((prev) => {
       const existing = prev.find((i) => i.id === producto.id);
       if (existing) {
+        if (existing.cantidad >= producto.stock) {
+          toast.error(`Solo hay ${producto.stock} unidades disponibles en stock.`);
+          return prev;
+        }
         return prev.map((i) =>
           i.id === producto.id ? { ...i, cantidad: i.cantidad + 1 } : i
         );
@@ -52,7 +62,7 @@ export function ProductCard({ producto }: ProductCardProps) {
   };
 
   return (
-    <Card className="flex flex-col justify-between hover:shadow-lg transition-shadow">
+    <Card className="flex flex-col justify-between hover:shadow-lg transition-shadow relative">
       <CardHeader>
         <CardTitle className="text-lg">{producto.nombre}</CardTitle>
         <CardDescription>{producto.categoria}</CardDescription>
@@ -64,20 +74,40 @@ export function ProductCard({ producto }: ProductCardProps) {
               src={producto.imagenUrl}
               alt={producto.nombre}
               fill
-              className="object-cover"
+              className={`object-cover ${isOutOfStock ? "opacity-40 grayscale" : ""}`}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
             <span className="text-slate-400 text-sm">Imagen no disponible</span>
           )}
+
+          {isOutOfStock && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
+                Producto sin stock
+              </span>
+            </div>
+          )}
         </div>
         <p className="text-2xl font-bold text-slate-900">
           {producto.precioFormateado}
         </p>
+        <p className="text-xs mt-1 font-medium">
+          {isOutOfStock ? (
+            <span className="text-red-600 font-semibold">Producto sin stock</span>
+          ) : (
+            <span className="text-slate-500">Stock disponible: {producto.stock}</span>
+          )}
+        </p>
       </CardContent>
       <CardFooter>
-        <Button className="w-full" onClick={addToCart}>
-          Agregar al carrito
+        <Button
+          className="w-full"
+          disabled={isOutOfStock}
+          onClick={addToCart}
+          variant={isOutOfStock ? "secondary" : "default"}
+        >
+          {isOutOfStock ? "Producto sin stock" : "Agregar al carrito"}
         </Button>
       </CardFooter>
     </Card>

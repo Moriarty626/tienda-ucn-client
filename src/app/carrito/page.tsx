@@ -41,8 +41,24 @@ export default function CarritoPage() {
       setItems([]);
       toast.success("Pedido realizado correctamente");
       router.push("/pedidos");
-    } catch {
-      toast.error("Error al procesar el pedido. Intenta de nuevo.");
+    } catch (error: unknown) {
+      const responseData = (error as {
+        response?: {
+          data?: {
+            detail?: string;
+            message?: string;
+            title?: string;
+          };
+        };
+      })?.response?.data;
+
+      const msg =
+        responseData?.detail ||
+        responseData?.message ||
+        responseData?.title ||
+        "Error al procesar el pedido. Intenta de nuevo.";
+
+      toast.error(msg);
     } finally {
       setIsCheckingOut(false);
     }
