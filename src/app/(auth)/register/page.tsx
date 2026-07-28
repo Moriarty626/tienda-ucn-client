@@ -201,7 +201,7 @@ export default function RegisterPage() {
             htmlFor="password"
             className="block text-sm font-medium text-slate-700 mb-1"
           >
-            Contrasena
+            Contraseña
           </label>
           <input
             id="password"
@@ -223,7 +223,7 @@ export default function RegisterPage() {
             htmlFor="confirmPassword"
             className="block text-sm font-medium text-slate-700 mb-1"
           >
-            Confirmar contrasena
+            Confirmar contraseña
           </label>
           <input
             id="confirmPassword"

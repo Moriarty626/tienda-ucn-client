@@ -26,7 +26,7 @@ function LoginForm() {
     const result = await authService.login(data.email, data.password);
 
     if (result?.error) {
-      toast.error("Credenciales invalidas. Verifica tu email y contrasena.");
+      toast.error("Credenciales invalidas. Verifica tu email y contraseña.");
       return;
     }
 
@@ -62,7 +62,7 @@ function LoginForm() {
           htmlFor="password"
           className="block text-sm font-medium text-slate-700 mb-1"
         >
-          Contrasena
+          Contraseña
         </label>
         <input
           id="password"

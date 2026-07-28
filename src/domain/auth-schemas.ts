@@ -52,9 +52,9 @@ export const LoginSchema = z.object({
     .min(1, "Email es requerido")
     .email("Email invalido"),
   password: z
-    .string("Contrasena es requerida")
-    .min(1, "Contrasena es requerida")
-    .min(6, "Contrasena debe tener al menos 6 caracteres"),
+    .string("Contraseña es requerida")
+    .min(1, "Contraseña es requerida")
+    .min(6, "Contraseña debe tener al menos 6 caracteres"),
 });
 
 export type LoginFormData = z.infer<typeof LoginSchema>;
@@ -93,58 +93,58 @@ export const RegisterSchema = z
       error: "Genero es requerido",
     }),
     password: z
-      .string("Contrasena es requerida")
-      .min(1, "Contrasena es requerida")
-      .min(8, "Contrasena debe tener al menos 8 caracteres")
-      .regex(/[A-Z]/, "Contrasena debe contener al menos una mayuscula")
-      .regex(/[a-z]/, "Contrasena debe contener al menos una minuscula")
-      .regex(/[0-9]/, "Contrasena debe contener al menos un numero")
+      .string("Contraseña es requerida")
+      .min(1, "Contraseña es requerida")
+      .min(8, "Contraseña debe tener al menos 8 caracteres")
+      .regex(/[A-Z]/, "Contraseña debe contener al menos una mayuscula")
+      .regex(/[a-z]/, "Contraseña debe contener al menos una minuscula")
+      .regex(/[0-9]/, "Contraseña debe contener al menos un numero")
       .regex(
         /[!@#$%^&*]/,
-        "Contrasena debe contener al menos un caracter especial (!@#$%^&*)"
+        "Contraseña debe contener al menos un caracter especial (!@#$%^&*)"
       ),
-    confirmPassword: z.string("Confirmar contrasena es requerido"),
+    confirmPassword: z.string("Confirmar contraseña es requerido"),
     terminos: z
       .boolean("Debe aceptar los terminos y condiciones")
       .refine((val) => val === true, "Debe aceptar los terminos y condiciones"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contrasenas no coinciden",
+    message: "Las contraseñas no coinciden",
     path: ["confirmPassword"],
   });
 
 export type RegisterFormData = z.infer<typeof RegisterSchema>;
 
-// Esquema para cambio de contrasena
+// Esquema para cambio de contraseña
 export const ChangePasswordSchema = z
   .object({
     currentPassword: z
-      .string("Contrasena actual es requerida")
-      .min(1, "Contrasena actual es requerida"),
+      .string("Contraseña actual es requerida")
+      .min(1, "Contraseña actual es requerida"),
     newPassword: z
-      .string("Nueva contrasena es requerida")
-      .min(8, "Contrasena debe tener al menos 8 caracteres")
-      .regex(/[A-Z]/, "Contrasena debe contener al menos una mayuscula")
-      .regex(/[a-z]/, "Contrasena debe contener al menos una minuscula")
-      .regex(/[0-9]/, "Contrasena debe contener al menos un numero")
+      .string("Nueva contraseña es requerida")
+      .min(8, "Contraseña debe tener al menos 8 caracteres")
+      .regex(/[A-Z]/, "Contraseña debe contener al menos una mayuscula")
+      .regex(/[a-z]/, "Contraseña debe contener al menos una minuscula")
+      .regex(/[0-9]/, "Contraseña debe contener al menos un numero")
       .regex(
         /[!@#$%^&*]/,
-        "Contrasena debe contener al menos un caracter especial (!@#$%^&*)"
+        "Contraseña debe contener al menos un caracter especial (!@#$%^&*)"
       ),
-    confirmPassword: z.string("Confirmar contrasena es requerido"),
+    confirmPassword: z.string("Confirmar contraseña es requerido"),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Las contrasenas no coinciden",
+    message: "Las contraseñas no coinciden",
     path: ["confirmPassword"],
   })
   .refine((data) => data.currentPassword !== data.newPassword, {
-    message: "La nueva contrasena no puede ser igual a la actual",
+    message: "La nueva contraseña no puede ser igual a la actual",
     path: ["newPassword"],
   });
 
 export type ChangePasswordFormData = z.infer<typeof ChangePasswordSchema>;
 
-// Esquema para recuperacion de contrasena
+// Esquema para recuperacion de contraseña
 export const ForgotPasswordSchema = z.object({
   email: z
     .string("Email es requerido")
@@ -160,19 +160,19 @@ export const ResetPasswordSchema = z
   .object({
     token: z.string("Token es requerido").min(1, "Token es requerido"),
     newPassword: z
-      .string("Nueva contrasena es requerida")
-      .min(8, "Contrasena debe tener al menos 8 caracteres")
-      .regex(/[A-Z]/, "Contrasena debe contener al menos una mayuscula")
-      .regex(/[a-z]/, "Contrasena debe contener al menos una minuscula")
-      .regex(/[0-9]/, "Contrasena debe contener al menos un numero")
+      .string("Nueva contraseña es requerida")
+      .min(8, "Contraseña debe tener al menos 8 caracteres")
+      .regex(/[A-Z]/, "Contraseña debe contener al menos una mayuscula")
+      .regex(/[a-z]/, "Contraseña debe contener al menos una minuscula")
+      .regex(/[0-9]/, "Contraseña debe contener al menos un numero")
       .regex(
         /[!@#$%^&*]/,
-        "Contrasena debe contener al menos un caracter especial (!@#$%^&*)"
+        "Contraseña debe contener al menos un caracter especial (!@#$%^&*)"
       ),
-    confirmPassword: z.string("Confirmar contrasena es requerido"),
+    confirmPassword: z.string("Confirmar contraseña es requerido"),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Las contrasenas no coinciden",
+    message: "Las contraseñas no coinciden",
     path: ["confirmPassword"],
   });
 

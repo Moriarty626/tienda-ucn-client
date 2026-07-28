@@ -56,11 +56,11 @@ export function LoginForm({ onSubmit, isLoading = false }: LoginFormProps) {
       <FormInput
         name="password"
         control={control}
-        label="Contrasena"
+        label="Contraseña"
         type="password"
-        placeholder="Ingresa tu contrasena"
+        placeholder="Ingresa tu contraseña"
         error={errors.password?.message}
-        rules={{ required: "Contrasena es requerida" }}
+        rules={{ required: "Contraseña es requerida" }}
       />
 
       <Button

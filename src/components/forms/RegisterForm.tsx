@@ -88,11 +88,11 @@ export function RegisterForm({
         <FormInput
           name="password"
           control={control}
-          label="Contrasena"
+          label="Contraseña"
           type="password"
-          placeholder="Crea una contrasena segura"
+          placeholder="Crea una contraseña segura"
           error={errors.password?.message}
-          rules={{ required: "Contrasena es requerida" }}
+          rules={{ required: "Contraseña es requerida" }}
           onFocus={() => setShowPasswordRequirements(true)}
           onBlur={() => setShowPasswordRequirements(false)}
           onChange={(e) => setPassword(e.target.value)}
@@ -101,7 +101,7 @@ export function RegisterForm({
         {(showPasswordRequirements || password) && (
           <div className="mt-2 p-3 bg-slate-50 rounded border border-slate-200">
             <p className="text-xs font-semibold text-slate-700 mb-2">
-              Requisitos de contrasena:
+              Requisitos de contraseña:
             </p>
             <ul className="space-y-1">
               {getPasswordRequirement(/.{8,}/, "Al menos 8 caracteres")}
@@ -120,11 +120,11 @@ export function RegisterForm({
       <FormInput
         name="confirmPassword"
         control={control}
-        label="Confirmar Contrasena"
+        label="Confirmar Contraseña"
         type="password"
-        placeholder="Confirma tu contrasena"
+        placeholder="Confirma tu contraseña"
         error={errors.confirmPassword?.message}
-        rules={{ required: "Confirmar contrasena es requerido" }}
+        rules={{ required: "Confirmar contraseña es requerido" }}
       />
 
       <FormCheckbox

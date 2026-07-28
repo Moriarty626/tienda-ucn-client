@@ -41,7 +41,7 @@ function HomeContent() {
           Catalogo de Productos
         </h1>
         <p className="text-slate-600 mt-2">
-          Encuentra los mejores suministros y quimicos para tu negocio.
+          Encuentra los mejores articulos para el hogar.
         </p>
       </div>
 

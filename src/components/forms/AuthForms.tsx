@@ -45,11 +45,11 @@ export function ChangePasswordForm({
       setErrorMessage("");
       setSuccessMessage("");
       await onSubmit(data);
-      setSuccessMessage("Contrasena actualizada exitosamente");
+      setSuccessMessage("Contraseña actualizada exitosamente");
       reset();
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : "Error al cambiar contrasena"
+        error instanceof Error ? error.message : "Error al cambiar contraseña"
       );
     }
   };
@@ -70,31 +70,31 @@ export function ChangePasswordForm({
       <FormInput
         name="currentPassword"
         control={control}
-        label="Contrasena Actual"
+        label="Contraseña Actual"
         type="password"
-        placeholder="Ingresa tu contrasena actual"
+        placeholder="Ingresa tu contraseña actual"
         error={errors.currentPassword?.message}
-        rules={{ required: "Contrasena actual es requerida" }}
+        rules={{ required: "Contraseña actual es requerida" }}
       />
 
       <FormInput
         name="newPassword"
         control={control}
-        label="Nueva Contrasena"
+        label="Nueva Contraseña"
         type="password"
-        placeholder="Ingresa la nueva contrasena"
+        placeholder="Ingresa la nueva contraseña"
         error={errors.newPassword?.message}
-        rules={{ required: "Nueva contrasena es requerida" }}
+        rules={{ required: "Nueva contraseña es requerida" }}
       />
 
       <FormInput
         name="confirmPassword"
         control={control}
-        label="Confirmar Nueva Contrasena"
+        label="Confirmar Nueva Contraseña"
         type="password"
-        placeholder="Confirma la nueva contrasena"
+        placeholder="Confirma la nueva contraseña"
         error={errors.confirmPassword?.message}
-        rules={{ required: "Confirmar contrasena es requerido" }}
+        rules={{ required: "Confirmar contraseña es requerido" }}
       />
 
       <Button
@@ -102,7 +102,7 @@ export function ChangePasswordForm({
         disabled={isLoading}
         className="w-full bg-blue-600 hover:bg-blue-700 text-white"
       >
-        {isLoading ? "Actualizando..." : "Cambiar Contrasena"}
+        {isLoading ? "Actualizando..." : "Cambiar Contraseña"}
       </Button>
     </form>
   );
@@ -211,7 +211,7 @@ export function ResetPasswordForm({
       await onSubmit(data);
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : "Error al restaurar contrasena"
+        error instanceof Error ? error.message : "Error al restaurar contraseña"
       );
     }
   };
@@ -227,21 +227,21 @@ export function ResetPasswordForm({
       <FormInput
         name="newPassword"
         control={control}
-        label="Nueva Contrasena"
+        label="Nueva Contraseña"
         type="password"
-        placeholder="Ingresa la nueva contrasena"
+        placeholder="Ingresa la nueva contraseña"
         error={errors.newPassword?.message}
-        rules={{ required: "Nueva contrasena es requerida" }}
+        rules={{ required: "Nueva contraseña es requerida" }}
       />
 
       <FormInput
         name="confirmPassword"
         control={control}
-        label="Confirmar Nueva Contrasena"
+        label="Confirmar Nueva Contraseña"
         type="password"
-        placeholder="Confirma la nueva contrasena"
+        placeholder="Confirma la nueva contraseña"
         error={errors.confirmPassword?.message}
-        rules={{ required: "Confirmar contrasena es requerido" }}
+        rules={{ required: "Confirmar contraseña es requerido" }}
       />
 
       <Button
@@ -249,7 +249,7 @@ export function ResetPasswordForm({
         disabled={isLoading}
         className="w-full bg-blue-600 hover:bg-blue-700 text-white"
       >
-        {isLoading ? "Actualizando..." : "Restaurar Contrasena"}
+        {isLoading ? "Actualizando..." : "Restaurar Contraseña"}
       </Button>
     </form>
   );
