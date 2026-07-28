@@ -6,6 +6,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { cartItemsAtom, cartTotalAtom } from "@/store/cart";
 import { Button } from "@/components/ui/button";
 import { axiosClient } from "@/clients";
@@ -16,6 +17,7 @@ export default function CarritoPage() {
   const [items, setItems] = useAtom(cartItemsAtom);
   const total = useAtomValue(cartTotalAtom);
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const updateCantidad = (id: number, delta: number) => {
@@ -39,6 +41,7 @@ export default function CarritoPage() {
         items: items.map((i) => ({ productoId: i.id, cantidad: i.cantidad })),
       });
       setItems([]);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Pedido realizado correctamente");
       router.push("/pedidos");
     } catch (error: unknown) {

@@ -1,11 +1,12 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 import { authService } from "@/services/authService";
 import { LoginSchema, type LoginFormData } from "@/domain/auth-schemas";
 
@@ -13,6 +14,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -26,7 +28,7 @@ function LoginForm() {
     const result = await authService.login(data.email, data.password);
 
     if (result?.error) {
-      toast.error("Credenciales invalidas. Revisa tu email o contrasena.");
+      toast.error(result.error);
       return;
     }
 
@@ -64,14 +66,29 @@ function LoginForm() {
         >
           Contrasena
         </label>
-        <input
-          id="password"
-          type="password"
-          autoComplete="current-password"
-          {...register("password")}
-          className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          disabled={isSubmitting}
-        />
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
+            {...register("password")}
+            className="w-full px-3 py-2 pr-10 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSubmitting}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+            tabIndex={-1}
+            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+          >
+            {showPassword ? (
+              <EyeOff className="w-4 h-4" />
+            ) : (
+              <Eye className="w-4 h-4" />
+            )}
+          </button>
+        </div>
         {errors.password && (
           <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
         )}

@@ -31,7 +31,37 @@ export const authService = {
    * Almacena el token JWT en la sesion
    */
   login: async (email: string, password: string) => {
-    return signIn("credentials", { email, password, redirect: false });
+    try {
+      // Validar primero directamente contra la API para obtener el mensaje de error exacto (ej. email no verificado)
+      await axiosClient.post(API_ROUTES.auth.login, { email, password });
+
+      // Si la llamada fue exitosa, iniciamos sesión con NextAuth para generar la cookie de sesión
+      const result = await signIn("credentials", { email, password, redirect: false });
+      if (result?.error) {
+        return { error: "Error al iniciar sesión en el cliente.", ok: false };
+      }
+      return result;
+    } catch (error: unknown) {
+      const responseData = (error as {
+        response?: {
+          data?: {
+            message?: string;
+            details?: string;
+            title?: string;
+            detail?: string;
+          };
+        };
+      })?.response?.data;
+
+      const errorMessage =
+        responseData?.details ||
+        responseData?.detail ||
+        responseData?.message ||
+        responseData?.title ||
+        "Credenciales inválidas. Revisa tu email o contraseña.";
+
+      return { error: errorMessage, ok: false };
+    }
   },
 
   /**

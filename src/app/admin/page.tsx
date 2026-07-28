@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,12 +15,12 @@ import { Producto } from "@/domain/Producto";
 import { Button } from "@/components/ui/button";
 
 const ProductSchema = z.object({
-  nombre: z.string().min(3, "Mínimo 3 caracteres").max(20, "Máximo 20 caracteres"),
-  descripcion: z.string().min(10, "Mínimo 10 caracteres").max(100, "Máximo 100 caracteres"),
+  nombre: z.string().min(3, "Mínimo 3 caracteres").max(100, "Máximo 100 caracteres"),
+  descripcion: z.string().min(10, "Mínimo 10 caracteres").max(1000, "Máximo 1000 caracteres"),
   categoria: z.enum(["Electronica", "Ropa", "Hogar", "Juguetes", "Libros"], {
     message: "Categoria invalida",
   }),
-  marca: z.string().min(3, "Mínimo 3 caracteres").max(25, "Máximo 25 caracteres"),
+  marca: z.string().min(3, "Mínimo 3 caracteres").max(100, "Máximo 100 caracteres"),
   precio: z.coerce.number().int().positive("El precio debe ser mayor a 0"),
   stock: z.coerce.number().int().positive("El stock debe ser mayor a 0"),
 });
@@ -218,8 +219,11 @@ function TableSkeleton() {
   );
 }
 
-export default function AdminPage() {
+function AdminContent() {
   const qc = useQueryClient();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("edit");
+
   const [editing, setEditing] = useState<Producto | null | undefined>(
     undefined
   );
@@ -228,6 +232,16 @@ export default function AdminPage() {
     queryKey: ["products"],
     queryFn: productService.getProducts,
   });
+
+  useEffect(() => {
+    if (editId && productos && productos.length > 0) {
+      const targetId = Number(editId);
+      const found = productos.find((p) => p.id === targetId);
+      if (found) {
+        setEditing(found);
+      }
+    }
+  }, [editId, productos]);
 
   const createMutation = useMutation({
     mutationFn: (vars: { data: ProductFormData; imagen?: File }) =>
@@ -406,5 +420,13 @@ export default function AdminPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AdminPage() {
+  return (
+    <Suspense fallback={<TableSkeleton />}>
+      <AdminContent />
+    </Suspense>
   );
 }
