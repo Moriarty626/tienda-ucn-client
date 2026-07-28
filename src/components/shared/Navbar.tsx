@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAtomValue } from "jotai";
 import { ShoppingCart, User, LogOut } from "lucide-react";
 import { toast } from "sonner";
@@ -12,7 +13,18 @@ import { cartCountAtom } from "@/store/cart";
 export default function Navbar() {
   const { user, isAuthenticated, isAdmin, isLoading } = useAuth();
   const cartCount = useAtomValue(cartCountAtom);
+  const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleCartClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      toast.error("Debe de iniciar sesion para continuar", {
+        id: "auth-cart-toast",
+      });
+      router.push("/login?callbackUrl=/carrito");
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -62,6 +74,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <Link
             href="/carrito"
+            onClick={handleCartClick}
             className="relative flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-slate-900"
           >
             <ShoppingCart size={20} />

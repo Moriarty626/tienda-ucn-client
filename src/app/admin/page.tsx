@@ -227,10 +227,17 @@ function AdminContent() {
   const [editing, setEditing] = useState<Producto | null | undefined>(
     undefined
   );
+  const [stockFilter, setStockFilter] = useState<"todos" | "stock" | "sin-stock">("todos");
 
   const { data: productos, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: productService.getProducts,
+  });
+
+  const filteredProductos = productos?.filter((p) => {
+    if (stockFilter === "stock") return (p.stock ?? 0) > 0;
+    if (stockFilter === "sin-stock") return (p.stock ?? 0) <= 0;
+    return true;
   });
 
   useEffect(() => {
@@ -367,7 +374,22 @@ function AdminContent() {
                   Precio
                 </th>
                 <th className="text-right px-4 py-3 font-semibold text-slate-700">
-                  Stock
+                  <div className="flex items-center justify-end gap-2">
+                    <span>Stock</span>
+                    <select
+                      value={stockFilter}
+                      onChange={(e) =>
+                        setStockFilter(
+                          e.target.value as "todos" | "stock" | "sin-stock"
+                        )
+                      }
+                      className="text-xs font-normal border border-slate-300 rounded px-2 py-1 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                    >
+                      <option value="todos">Todos</option>
+                      <option value="stock">Con Stock</option>
+                      <option value="sin-stock">Sin Stock</option>
+                    </select>
+                  </div>
                 </th>
                 <th className="text-right px-4 py-3 font-semibold text-slate-700">
                   Acciones
@@ -375,7 +397,7 @@ function AdminContent() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {productos?.map((p) => (
+              {filteredProductos?.map((p) => (
                 <tr key={p.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium text-slate-900">
                     {p.nombre}
@@ -412,9 +434,13 @@ function AdminContent() {
               ))}
             </tbody>
           </table>
-          {(!productos || productos.length === 0) && (
+          {(!filteredProductos || filteredProductos.length === 0) && (
             <p className="text-center text-slate-500 py-8">
-              No hay productos registrados.
+              {stockFilter !== "todos"
+                ? `No hay productos registrados con la opción "${
+                    stockFilter === "stock" ? "Con Stock" : "Sin Stock"
+                  }".`
+                : "No hay productos registrados."}
             </p>
           )}
         </div>

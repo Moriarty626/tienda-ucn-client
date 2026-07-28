@@ -5,20 +5,31 @@ import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { cartItemsAtom, cartTotalAtom } from "@/store/cart";
 import { Button } from "@/components/ui/button";
 import { axiosClient } from "@/clients";
 import { API_ROUTES } from "@/clients/apiRoutes";
 import { formatPrice } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function CarritoPage() {
+  const { isAuthenticated, isLoading } = useAuth();
   const [items, setItems] = useAtom(cartItemsAtom);
   const total = useAtomValue(cartTotalAtom);
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      toast.error("Debe de iniciar sesion para continuar", {
+        id: "auth-cart-toast",
+      });
+      router.replace("/login?callbackUrl=/carrito");
+    }
+  }, [isLoading, isAuthenticated, router]);
 
   const updateCantidad = (id: number, delta: number) => {
     setItems((prev) =>
@@ -41,25 +52,38 @@ export default function CarritoPage() {
         items: items.map((i) => ({ productoId: i.id, cantidad: i.cantidad })),
       });
       setItems([]);
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
+      await queryClient.invalidateQueries({ queryKey: ["my-orders"] });
       toast.success("Pedido realizado correctamente");
-      router.push("/pedidos");
+      router.push("/");
     } catch (error: unknown) {
-      const responseData = (error as {
+      const response = (error as {
         response?: {
+          status?: number;
           data?: {
             detail?: string;
             message?: string;
             title?: string;
           };
         };
-      })?.response?.data;
+      })?.response;
 
-      const msg =
+      const responseData = response?.data;
+      const status = response?.status;
+
+      let msg =
         responseData?.detail ||
         responseData?.message ||
         responseData?.title ||
         "Error al procesar el pedido. Intenta de nuevo.";
+
+      if (
+        status === 409 ||
+        msg.toLowerCase().includes("conflicto") ||
+        msg.toLowerCase().includes("stock")
+      ) {
+        msg = "Stock no disponible";
+      }
 
       toast.error(msg);
     } finally {

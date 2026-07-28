@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -15,6 +15,14 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (callbackUrl.includes("/carrito")) {
+      toast.error("Debe de iniciar sesion para continuar", {
+        id: "auth-cart-toast",
+      });
+    }
+  }, [callbackUrl]);
 
   const {
     register,

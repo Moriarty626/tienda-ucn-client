@@ -45,7 +45,11 @@ function HomeContent() {
         </p>
       </div>
 
-      <ProductFilters onFiltersChange={updateFilters} isLoading={isLoading} />
+      <ProductFilters
+        initialFilters={filters}
+        onFiltersChange={updateFilters}
+        isLoading={isLoading}
+      />
 
       <ProductGrid productos={data?.data} isLoading={isLoading} />
 

@@ -51,13 +51,13 @@ test.describe("Flujo de carrito y checkout", () => {
     expect(totalBefore).not.toBe(totalAfter);
   });
 
-  test("checkout exitoso redirige a pedidos", async ({ page }) => {
+  test("checkout exitoso redirige al catalogo", async ({ page }) => {
     await page.waitForSelector("button:has-text('Agregar al carrito')", {
       timeout: 8000,
     });
     await page.locator("button:has-text('Agregar al carrito')").first().click();
     await page.goto("/carrito");
     await page.click("button:has-text('Confirmar pedido')");
-    await expect(page).toHaveURL("/pedidos", { timeout: 10000 });
+    await expect(page).toHaveURL("/", { timeout: 10000 });
   });
 });

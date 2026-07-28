@@ -38,12 +38,14 @@ export function useProductFiltersUrl() {
         | "";
     }
 
-    if (searchParams.get("precioMin")) {
-      newFilters.precioMin = parseFloat(searchParams.get("precioMin") || "");
+    if (searchParams.get("precioMin") !== null && searchParams.get("precioMin") !== "") {
+      const val = parseFloat(searchParams.get("precioMin") || "");
+      if (!isNaN(val)) newFilters.precioMin = val;
     }
 
-    if (searchParams.get("precioMax")) {
-      newFilters.precioMax = parseFloat(searchParams.get("precioMax") || "");
+    if (searchParams.get("precioMax") !== null && searchParams.get("precioMax") !== "") {
+      const val = parseFloat(searchParams.get("precioMax") || "");
+      if (!isNaN(val)) newFilters.precioMax = val;
     }
 
     if (searchParams.get("search")) {
@@ -66,11 +68,11 @@ export function useProductFiltersUrl() {
         params.set("categoria", newFilters.categoria);
       }
 
-      if (newFilters.precioMin !== undefined && newFilters.precioMin > 0) {
+      if (newFilters.precioMin !== undefined && !isNaN(newFilters.precioMin) && newFilters.precioMin >= 0) {
         params.set("precioMin", newFilters.precioMin.toString());
       }
 
-      if (newFilters.precioMax !== undefined && newFilters.precioMax > 0) {
+      if (newFilters.precioMax !== undefined && !isNaN(newFilters.precioMax) && newFilters.precioMax >= 0) {
         params.set("precioMax", newFilters.precioMax.toString());
       }
 

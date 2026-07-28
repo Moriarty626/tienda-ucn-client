@@ -24,7 +24,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ producto }: ProductCardProps) {
-  const { isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   const setCart = useSetAtom(cartItemsAtom);
   const router = useRouter();
   const [imgError, setImgError] = useState(false);
@@ -61,7 +61,16 @@ export function ProductCard({ producto }: ProductCardProps) {
       duration: 1200,
       action: {
         label: "Ver carrito",
-        onClick: () => router.push("/carrito"),
+        onClick: () => {
+          if (!isAuthenticated) {
+            toast.error("Debe de iniciar sesion para continuar", {
+              id: "auth-cart-toast",
+            });
+            router.push("/login?callbackUrl=/carrito");
+          } else {
+            router.push("/carrito");
+          }
+        },
       },
     });
   };

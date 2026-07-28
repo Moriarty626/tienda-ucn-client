@@ -53,6 +53,7 @@ export function ProductsView({
       </div>
 
       <ProductFilters
+        initialFilters={filters}
         onFiltersChange={updateFilters}
         isLoading={isLoading}
       />

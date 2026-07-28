@@ -60,6 +60,8 @@ export default function PedidosPage() {
   } = useQuery({
     queryKey: ["my-orders"],
     queryFn: orderService.getMyOrders,
+    refetchOnMount: "always",
+    staleTime: 0,
   });
 
   if (isLoading)
